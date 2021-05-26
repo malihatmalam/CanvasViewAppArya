@@ -1,5 +1,4 @@
 package com.project.best.canvasviewapparya;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,24 +12,28 @@ import android.view.View;
 
 import androidx.core.content.res.ResourcesCompat;
 
-@SuppressWarnings("FieldCanBeLocal")
 public class MyCanvasView extends View {
 
     private final Paint mPaint;
     private final Path mPath;
-    private final int mBackgroundColor;
     private final int mDrawColor;
+    private final int mBackgroundColor;
     private Canvas mCanvas;
     private Bitmap mBitmap;
+    private Rect mFrame;
 
-    MyCanvasView(Context context){
-        this(context, null);
-    }
+//    MyCanvasView(Context context) {
+//        this(context, null);
+//
+//    }
 
     public MyCanvasView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
-        mBackgroundColor = ResourcesCompat.getColor(getResources(), R.color.green_500, null);
-        mDrawColor = ResourcesCompat.getColor(getResources(), R.color.amber_700, null);
+        mBackgroundColor=ResourcesCompat.getColor(getResources(),
+                R.color.yellow_800, null);
+        mDrawColor=ResourcesCompat.getColor(getResources(),
+                R.color.green_700, null);
+
         mPath = new Path();
         mPaint = new Paint();
         mPaint.setColor(mDrawColor);
@@ -45,19 +48,21 @@ public class MyCanvasView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        mBitmap=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mCanvas.drawColor(mBackgroundColor);
 
-        int inset = 30;
-        Rect mFrame = new Rect(inset, inset, w - inset, h - inset);
+        int inset=30;
+        mFrame=new Rect(inset, inset, w-inset, h-inset);
         mCanvas.drawRect(mFrame, mPaint);
     }
 
+    //update ketika ada perubahan
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawBitmap(mBitmap, 0, 0, null);
+
+        canvas.drawBitmap(mBitmap, 0,0,null);
     }
 
     private float mX, mY;
@@ -72,15 +77,15 @@ public class MyCanvasView extends View {
     private void touchMove(float x, float y){
         float dx = Math.abs(x-mX);
         float dy = Math.abs(y-mY);
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            mPath.quadTo(mX, mY, (x+mX)/2, (y+mY)/2);
+        if(dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE){
+            mPath.quadTo(mX,mY,(x+mX)/2, (y+mY)/2);
             mX = x;
             mY = y;
             mCanvas.drawPath(mPath, mPaint);
         }
     }
 
-    private void touchUp() {
+    private void touchEnd(){
         mPath.reset();
     }
 
@@ -90,7 +95,7 @@ public class MyCanvasView extends View {
         float x = event.getX();
         float y = event.getY();
 
-        switch (event.getAction()) {
+        switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 touchStart(x, y);
                 break;
@@ -99,20 +104,19 @@ public class MyCanvasView extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                touchUp();
+                touchEnd();
                 break;
             default:
-
         }
 
         return true;
-    }
 
+    }
     public void setPathColor(int color){
         mPaint.setColor(color);
     }
 
-    public void setPathStrokeWidth(float width){
+    public void setWidthStroke(float width){
         mPaint.setStrokeWidth(width);
     }
 }

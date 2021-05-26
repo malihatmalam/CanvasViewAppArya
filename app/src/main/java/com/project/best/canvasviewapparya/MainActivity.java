@@ -1,82 +1,87 @@
 package com.project.best.canvasviewapparya;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.dhaval2404.colorpicker.ColorPickerDialog;
-import com.github.dhaval2404.colorpicker.listener.ColorListener;
 import com.github.dhaval2404.colorpicker.model.ColorShape;
-import com.github.stephenvinouze.materialnumberpickercore.MaterialNumberPicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private AlertDialog numberPickerDialog;
-    private FloatingActionButton fabPathColor, fabPathStrokeWidth;
-    private MaterialNumberPicker numberPicker;
     private MyCanvasView myCanvasView;
-
-    private int colorSelected = R.color.black;
-    private int strokeWidthSelected = 12;
+    private int mSelectedColor=R.color.blue_500;
+    private int mSelectedStroke=12;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        /*MyCanvasView myCanvasView = new MyCanvasView(this, null);
-        myCanvasView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);*/
+//        MyCanvasView myCanvasView;
+//        myCanvasView = new MyCanvasView(this);
+//        myCanvasView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        myCanvasView = findViewById(R.id.my_canvas_view);
+        myCanvasView = findViewById(R.id.canvas_view);
 
-        fabPathColor = findViewById(R.id.fab_path_color);
-        fabPathStrokeWidth = findViewById(R.id.fab_path_stroke_width);
-        fabPathColor.setOnClickListener(this);
-        fabPathStrokeWidth.setOnClickListener(this);
-
-        numberPicker = new MaterialNumberPicker(this);
-        numberPicker.setMinValue(1);
-        numberPicker.setMaxValue(100);
-
-        AlertDialog.Builder numberPickerDialogBuilder = new AlertDialog.Builder(this)
-                .setTitle("Pick Path Stroke Width")
-                .setView(numberPicker)
-                .setNegativeButton(getString(android.R.string.cancel), null)
-                .setPositiveButton(getString(android.R.string.ok), (dialogInterface, i) -> {
-                    strokeWidthSelected = numberPicker.getValue();
-                    myCanvasView.setPathStrokeWidth(numberPicker.getValue());
-                    numberPicker.removeAllViews();
-                });
-        numberPickerDialog = numberPickerDialogBuilder.create();
+        FloatingActionButton fabColor = findViewById(R.id.fab_color_picker);
+        FloatingActionButton fabWidth = findViewById(R.id.fab_width_stroke);
+        fabColor.setOnClickListener(this);
+        fabWidth.setOnClickListener(this);
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        if (id == R.id.fab_path_color){
-            showColorPickerDialog();
-        } else if (id == R.id.fab_path_stroke_width) {
-            showNumberPickerDialog();
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fab_color_picker:
+                colorPicker();
+                break;
+            case R.id.fab_width_stroke:
+                widthStroke();
+            default:
+                break;
         }
     }
 
-    private void showColorPickerDialog() {
-        new ColorPickerDialog.Builder(this)
-                .setTitle("Pick Path Color")
+    private void colorPicker(){
+        new ColorPickerDialog
+                .Builder(this)
+                .setTitle("Pick Color")
                 .setColorShape(ColorShape.SQAURE)
-                .setDefaultColor(colorSelected)
-                .setColorListener((ColorListener) (color, colorHex) -> {
-                    colorSelected = color;
-                    myCanvasView.setPathColor(color);
-                    fabPathColor.setBackgroundColor(color);
-                    fabPathStrokeWidth.setBackgroundColor(color);
-                }).show();
+                .setDefaultColor(mSelectedColor)
+                .setColorListener((color, colorHex) -> {
+                    mSelectedColor = color;
+                    myCanvasView.setPathColor(mSelectedColor);
+                })
+                .show();
     }
 
-    private void showNumberPickerDialog() {
-        numberPicker.setValue(strokeWidthSelected);
-        numberPickerDialog.show();
+    private void widthStroke(){
+        MaterialNumberPicker mNumberPicker = new MaterialNumberPicker.Builder(this)
+                .minValue(1)
+                .maxValue(25)
+                .defaultValue(mSelectedStroke)
+                .backgroundColor(Color.WHITE)
+                .separatorColor(Color.TRANSPARENT)
+                .textSize(12)
+                .enableFocusability(false)
+                .wrapSelectorWheel(true)
+                .build();
+
+        new AlertDialog.Builder(this)
+                .setTitle("Pick Stroke Width")
+                .setView(mNumberPicker).setNegativeButton(getString(android.R.string.cancel), null)
+                .setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
+                    mSelectedStroke = mNumberPicker.getValue();
+                    myCanvasView.setWidthStroke(mSelectedStroke);
+                })
+                .show();
     }
 }
